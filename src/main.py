@@ -27,6 +27,10 @@ class FileUploadResponse(BaseModel):
     file_mime_type: str
 
 
+class MultipleFileUploadResponse(BaseModel):
+    message: str
+
+
 async def save_file(file: UploadFile) -> dict[str, str]:
     # Step 1: Construct the file path
     file_path: str = path.join(UPLOAD_DIR, file.filename)
@@ -46,24 +50,13 @@ async def save_file(file: UploadFile) -> dict[str, str]:
 # Handlers
 @api.post(path="/upload-file", response_model=FileUploadResponse)
 async def upload_file(file: Annotated[UploadFile, File(...)]):
-    # Step 1: Construct the file path
-    file_path: str = path.join(UPLOAD_DIR, file.filename)
-    # Step 2: Save the file using non-blocking IO
-    async with open(file_path, "wb") as saved_file:
-        # Step 3: Asynchronously read chunks of 1024 bytes
-        while content := await file.read(1024):
-            # Step 4: Write the chunked content to the file_path
-            await saved_file.write(content)
-
-    return {
-        "filename": file.filename,
-        "file_mime_type": file.content_type,
-    }
+    # Save the file asynchronously
+    return await save_file(file)
 
 
-@api.post(path="/multiple-file-upload")
+@api.post(path="/multiple-file-upload", response_model=MultipleFileUploadResponse)
 async def multiple_file_upload(files: Annotated[list[UploadFile], File(...)]):
-    # Step 1: Save multiple files concurrently
+    # Save multiple files concurrently
     await gather(*[save_file(file) for file in files])
 
     return {
