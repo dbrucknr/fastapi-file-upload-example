@@ -1,0 +1,16 @@
+[project]
+name = "fastapi-file-upload"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiofiles>=24.1.0",
+    "fastapi>=0.115.8",
+    "httptools>=0.6.4",
+    "orjson>=3.10.15",
+    "pydantic>=2.10.6",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.34.0",
+    "uvloop>=0.21.0",
+]
